@@ -216,6 +216,28 @@ log "terraform apply..."
 terraform apply -auto-approve tfplan 2>&1 | tee -a "$LOG_FILE"
 ok "terraform apply selesai"
 
+# Ensure TCP 9100 rule exists in lks-sg-ecs (sometimes missed if SG pre-existed)
+log "Verifikasi rule TCP 9100 di lks-sg-ecs..."
+SG_ECS_CHECK=$(terraform output -raw sg_ecs_id 2>/dev/null || echo "")
+if [ -n "$SG_ECS_CHECK" ]; then
+  RULE_EXISTS=$(aws ec2 describe-security-groups \
+    --group-ids "$SG_ECS_CHECK" \
+    --query "SecurityGroups[0].IpPermissions[?FromPort==\`9100\`] | length(@)" \
+    --output text --region us-east-1 2>/dev/null || echo "0")
+  if [ "${RULE_EXISTS:-0}" -eq 0 ]; then
+    warn "TCP 9100 rule tidak ada — menambahkan manual..."
+    aws ec2 authorize-security-group-ingress \
+      --group-id "$SG_ECS_CHECK" \
+      --protocol tcp --port 9100 \
+      --cidr "10.1.0.0/16" \
+      --region us-east-1 2>/dev/null \
+      && ok "TCP 9100 rule ditambahkan ke lks-sg-ecs" \
+      || warn "Gagal tambah rule — cek manual di Console"
+  else
+    ok "lks-sg-ecs: TCP 9100 dari 10.1.0.0/16 sudah ada"
+  fi
+fi
+
 # Read outputs
 VPC_ID=$(terraform output -raw vpc_id 2>/dev/null || echo "")
 ALB_DNS=$(terraform output -raw alb_dns_name 2>/dev/null || echo "")
@@ -317,6 +339,7 @@ API_TD=$(aws ecs register-task-definition \
       {\"name\": \"DB_NAME\",      \"value\": \"lksdb\"},
       {\"name\": \"DB_USER\",      \"value\": \"lksadmin\"},
       {\"name\": \"DB_PASSWORD\",  \"value\": \"LKSSecure2026!\"},
+      {\"name\": \"DB_SSL\",       \"value\": \"true\"},
       {\"name\": \"AWS_REGION\",   \"value\": \"us-east-1\"},
       {\"name\": \"NODE_ENV\",     \"value\": \"production\"}
     ],
@@ -351,6 +374,7 @@ if [ "$FE_SVC_STATUS" = "ACTIVE" ]; then
     --cluster lks-ecs-cluster \
     --service lks-fe-service \
     --task-definition lks-fe-task \
+    --force-new-deployment \
     --region us-east-1 --output json >/dev/null
 else
   aws ecs create-service \
@@ -379,6 +403,7 @@ if [ "$API_SVC_STATUS" = "ACTIVE" ]; then
     --cluster lks-ecs-cluster \
     --service lks-api-service \
     --task-definition lks-api-task \
+    --force-new-deployment \
     --region us-east-1 --output json >/dev/null
 else
   aws ecs create-service \

@@ -249,15 +249,15 @@ if [ -n "$ALB_DNS" ]; then
     -H "Content-Type: application/json" \
     -d "{\"name\":\"Test Siswa $TS\",\"email\":\"siswa$TS@lks2026.id\",\"institution\":\"SMK LKS\",\"position\":\"Contestant\"}" \
     2>/dev/null || echo "{}")
-  UID=$(echo "$CR" | jq -r '.id // empty' 2>/dev/null)
-  if [ -n "$UID" ]; then
-    pass "CRUD Create: berhasil (ID: $UID)"
-    RD=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "http://$ALB_DNS/api/users/$UID" 2>/dev/null || echo "000")
+  USER_ID=$(echo "$CR" | jq -r '.id // empty' 2>/dev/null)
+  if [ -n "$USER_ID" ]; then
+    pass "CRUD Create: berhasil (ID: $USER_ID)"
+    RD=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "http://$ALB_DNS/api/users/$USER_ID" 2>/dev/null || echo "000")
     [ "$RD" = "200" ] && pass "CRUD Read: 200" || fail "CRUD Read: $RD"
-    UP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -X PUT "http://$ALB_DNS/api/users/$UID" \
+    UP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -X PUT "http://$ALB_DNS/api/users/$USER_ID" \
       -H "Content-Type: application/json" -d '{"name":"Updated","position":"Winner"}' 2>/dev/null || echo "000")
     [ "$UP" = "200" ] && pass "CRUD Update: 200" || fail "CRUD Update: $UP"
-    DL=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -X DELETE "http://$ALB_DNS/api/users/$UID" 2>/dev/null || echo "000")
+    DL=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -X DELETE "http://$ALB_DNS/api/users/$USER_ID" 2>/dev/null || echo "000")
     [ "$DL" = "200" ] && pass "CRUD Delete: 200" || fail "CRUD Delete: $DL"
   else
     fail "CRUD Create gagal: $CR"

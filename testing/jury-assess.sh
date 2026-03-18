@@ -354,44 +354,44 @@ if [ -n "$ALB_DNS" ]; then
     -H "Content-Type: application/json" \
     -d "{\"name\":\"Jury Test $TS\",\"email\":\"jury$TS@lks2026.id\",\"institution\":\"LKS 2026 Jury\",\"position\":\"Evaluator\"}" \
     2>/dev/null || echo "{}")
-  UID=$(echo "$CR" | jq -r '.id // empty' 2>/dev/null)
+  USER_ID=$(echo "$CR" | jq -r '.id // empty' 2>/dev/null)
 
-  if [ -n "$UID" ]; then
-    award "F" 4 "CRUD Create: berhasil (ID: $UID)"
+  if [ -n "$USER_ID" ]; then
+    award "F" 4 "CRUD Create: berhasil (ID: $USER_ID)"
 
     RD=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-      "http://$ALB_DNS/api/users/$UID" 2>/dev/null || echo "000")
+      "http://$ALB_DNS/api/users/$USER_ID" 2>/dev/null || echo "000")
     [ "$RD" = "200" ] \
-      && award "F" 2 "CRUD Read: GET /api/users/$UID → 200" \
+      && award "F" 2 "CRUD Read: GET /api/users/$USER_ID → 200" \
       || no_award "F" 2 "CRUD Read: $RD"
 
     UP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-      -X PUT "http://$ALB_DNS/api/users/$UID" \
+      -X PUT "http://$ALB_DNS/api/users/$USER_ID" \
       -H "Content-Type: application/json" \
       -d '{"name":"Updated by Jury","position":"Verified"}' \
       2>/dev/null || echo "000")
     [ "$UP" = "200" ] \
-      && award "F" 2 "CRUD Update: PUT /api/users/$UID → 200" \
+      && award "F" 2 "CRUD Update: PUT /api/users/$USER_ID → 200" \
       || no_award "F" 2 "CRUD Update: $UP"
 
     # Verify update persisted
     UPDATED_POS=$(curl -s --max-time 10 \
-      "http://$ALB_DNS/api/users/$UID" 2>/dev/null \
+      "http://$ALB_DNS/api/users/$USER_ID" 2>/dev/null \
       | jq -r '.position // empty' 2>/dev/null)
     [ "$UPDATED_POS" = "Verified" ] \
       && award "F" 2 "CRUD Update: perubahan tersimpan di DB" \
       || no_award "F" 2 "CRUD Update: data tidak tersimpan dengan benar"
 
     DL=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-      -X DELETE "http://$ALB_DNS/api/users/$UID" \
+      -X DELETE "http://$ALB_DNS/api/users/$USER_ID" \
       2>/dev/null || echo "000")
     [ "$DL" = "200" ] \
-      && award "F" 2 "CRUD Delete: DELETE /api/users/$UID → 200" \
+      && award "F" 2 "CRUD Delete: DELETE /api/users/$USER_ID → 200" \
       || no_award "F" 2 "CRUD Delete: $DL"
 
     # Verify deletion
     GONE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
-      "http://$ALB_DNS/api/users/$UID" 2>/dev/null || echo "000")
+      "http://$ALB_DNS/api/users/$USER_ID" 2>/dev/null || echo "000")
     [ "$GONE" = "404" ] \
       && award "F" 2 "CRUD Delete: data benar-benar terhapus (404 setelah delete)" \
       || no_award "F" 2 "CRUD Delete: data masih ada setelah delete (HTTP $GONE)"
