@@ -13,7 +13,7 @@ output "dynamodb_table_name" {
   value = aws_dynamodb_table.sessions.name
 }
 output "tfstate_bucket_name" {
-  value = aws_s3_bucket.tfstate.bucket
+  value = data.aws_s3_bucket.tfstate.bucket
 }
 output "assets_bucket_name" {
   value = aws_s3_bucket.assets.bucket

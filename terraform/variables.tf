@@ -1,11 +1,11 @@
 variable "aws_region" {
-  description = "Primary region — application VPC (us-east-1)"
+  description = "Primary region - application VPC (us-east-1)"
   type        = string
   default     = "us-east-1"
 }
 
 variable "monitoring_region" {
-  description = "Secondary region — monitoring VPC (us-west-2 Oregon)"
+  description = "Secondary region - monitoring VPC (us-west-2 Oregon)"
   type        = string
   default     = "us-west-2"
 }
@@ -16,7 +16,7 @@ variable "aws_account_id" {
 }
 
 variable "student_name" {
-  description = "Your name — used in S3 bucket names to ensure global uniqueness"
+  description = "Your name - used in S3 bucket names to ensure global uniqueness"
   type        = string
 }
 

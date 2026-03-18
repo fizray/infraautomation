@@ -1,5 +1,3 @@
-# ── Security Groups ─────────────────────────────────────────
-
 terraform {
   required_providers {
     aws = {
@@ -8,9 +6,10 @@ terraform {
     }
   }
 }
+
 resource "aws_security_group" "alb" {
   name        = "lks-sg-alb"
-  description = "ALB — allow HTTP from internet"
+  description = "ALB allow HTTP from internet"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -36,7 +35,7 @@ resource "aws_security_group" "alb" {
 
 resource "aws_security_group" "ecs" {
   name        = "lks-sg-ecs"
-  description = "ECS tasks — app traffic from ALB + metrics from Prometheus"
+  description = "ECS tasks allow traffic from ALB and metrics from Prometheus"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -71,7 +70,7 @@ resource "aws_security_group" "ecs" {
 
 resource "aws_security_group" "db" {
   name        = "lks-sg-db"
-  description = "Database — allow access from ECS only"
+  description = "Database allow access from ECS only"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -82,7 +81,7 @@ resource "aws_security_group" "db" {
     security_groups = [aws_security_group.ecs.id]
   }
   ingress {
-    description     = "DynamoDB/SQS HTTPS from ECS"
+    description     = "DynamoDB and SQS HTTPS from ECS"
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"

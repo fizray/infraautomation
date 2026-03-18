@@ -79,30 +79,14 @@ resource "aws_sqs_queue" "this" {
 }
 
 # S3 — Terraform state bucket
-resource "aws_s3_bucket" "tfstate" {
-  bucket        = var.tfstate_bucket_name
-  force_destroy = false
-  tags          = { Name = var.tfstate_bucket_name }
-}
-resource "aws_s3_bucket_versioning" "tfstate" {
-  bucket = aws_s3_bucket.tfstate.id
-  versioning_configuration { status = "Enabled" }
-}
-resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate" {
-  bucket = aws_s3_bucket.tfstate.id
-  rule {
-    apply_server_side_encryption_by_default { sse_algorithm = "AES256" }
-  }
-}
-resource "aws_s3_bucket_public_access_block" "tfstate" {
-  bucket                  = aws_s3_bucket.tfstate.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+# This bucket is created BEFORE terraform apply (in Step 1 of jury-deploy.sh
+# or manually by the contestant). Use data source to reference it without
+# recreating — avoids BucketAlreadyExists error on re-apply.
+data "aws_s3_bucket" "tfstate" {
+  bucket = var.tfstate_bucket_name
 }
 
-# S3 — App assets bucket
+# S3 — App assets bucket (Terraform manages this one)
 resource "aws_s3_bucket" "assets" {
   bucket        = var.assets_bucket_name
   force_destroy = true
