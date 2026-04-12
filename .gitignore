@@ -9,8 +9,8 @@ terraform.tfvars
 # Keep the example file
 !terraform.tfvars.example
 
-# ── Terraform — hanya module Section 3.2-3.5 yang di-upload ─
-# Exclude semua terraform dulu, lalu include yang diperlukan
+# ── Terraform — only Section 3.2-3.6 modules are pushed ──
+# Exclude all terraform first, then include what's needed
 terraform/**
 !terraform/
 !terraform/*.tf
@@ -25,8 +25,10 @@ terraform/**
 !terraform/modules/alb/**
 !terraform/modules/database/
 !terraform/modules/database/**
+!terraform/modules/s3/
+!terraform/modules/s3/**
 
-# Answer key — juri only, jangan di-push ke repo peserta
+# Answer key — jury only, do not push to student repo
 terraform/answer-key/
 
 testing/

@@ -73,7 +73,13 @@ output "dynamodb_table_name" {
   value       = module.database.dynamodb_table_name
 }
 
+# ── S3 ────────────────────────────────────────────────────
+output "tfstate_bucket_name" {
+  description = "S3 bucket for CI/CD deployment metadata"
+  value       = module.s3.tfstate_bucket_name
+}
+
 output "assets_bucket_name" {
   description = "S3 assets bucket name"
-  value       = module.database.assets_bucket_name
+  value       = module.s3.assets_bucket_name
 }

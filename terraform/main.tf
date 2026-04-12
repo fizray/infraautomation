@@ -67,6 +67,11 @@ module "database" {
   sqs_queue_name = "lks-event-queue"
   dlq_name       = "lks-dlq"
   dynamo_table   = "lks-sessions"
+}
+
+# ── 5. S3 Buckets — us-east-1 ────────────────────────────
+module "s3" {
+  source = "./modules/s3"
 
   tfstate_bucket_name = "lks-tfstate-${var.student_name}-${substr(var.aws_account_id, -8, -1)}"
   assets_bucket_name  = "lks-app-assets-${var.student_name}-2026"

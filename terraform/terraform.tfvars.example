@@ -1,21 +1,18 @@
 # Copy this to terraform.tfvars — never commit it (listed in .gitignore)
 
-aws_region        = "us-east-1"
-monitoring_region = "us-west-2"
-aws_account_id    = "123456789012"   # Replace with your 12-digit account ID
-student_name      = "yourname"       # Replace — used in S3 bucket names
+aws_region     = "us-east-1"
+aws_account_id = "123456789012"   # Replace with your 12-digit account ID
+student_name   = "yourname"       # Replace — used in S3 bucket names
 
 # Networking — do not change for LKS 2026
-vpc_cidr                      = "10.0.0.0/16"
-monitoring_vpc_cidr           = "10.1.0.0/16"
-public_subnet_cidrs           = ["10.0.1.0/24", "10.0.2.0/24"]
-private_subnet_cidrs          = ["10.0.3.0/24", "10.0.4.0/24"]
-isolated_subnet_cidrs         = ["10.0.5.0/24", "10.0.6.0/24"]
-availability_zones            = ["us-east-1a", "us-east-1b"]
-monitoring_subnet_cidrs       = ["10.1.1.0/24", "10.1.2.0/24"]
-monitoring_availability_zones = ["us-west-2a", "us-west-2b"]
+vpc_cidr              = "10.0.0.0/16"
+monitoring_vpc_cidr   = "10.1.0.0/16"
+public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs  = ["10.0.3.0/24", "10.0.4.0/24"]
+isolated_subnet_cidrs = ["10.0.5.0/24", "10.0.6.0/24"]
+availability_zones    = ["us-east-1a", "us-east-1b"]
 
 # Database
-db_name       = "lksdb"
-db_username   = "lksadmin"
-db_password   = "LKSSecure2026!"
+db_name     = "lksdb"
+db_username = "lksadmin"
+db_password = "LKSSecure2026!"

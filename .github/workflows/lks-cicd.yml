@@ -6,10 +6,9 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION:          ${{ secrets.AWS_REGION }}
-  MONITORING_REGION:   ${{ secrets.MONITORING_REGION }}
-  ECR_REGISTRY:        ${{ secrets.ECR_REGISTRY }}
-  ECR_REGISTRY_OREGON: ${{ secrets.ECR_REGISTRY_OREGON }}
+  AWS_REGION:        ${{ secrets.AWS_REGION }}
+  MONITORING_REGION: ${{ secrets.MONITORING_REGION }}
+  ECR_REGISTRY:      ${{ secrets.ECR_REGISTRY }}
 
 # ═══════════════════════════════════════════════════════════
 #  JOB 1 — install
@@ -121,60 +120,3 @@ jobs:
           }" > /tmp/meta.json
           aws s3 cp /tmp/meta.json \
             s3://${{ secrets.TF_STATE_BUCKET }}/deployments/${{ github.sha }}.json
-
-# ═══════════════════════════════════════════════════════════
-#  JOB 4 — deploy
-#  Terraform: provision all infrastructure including ECR, ECS, Monitoring.
-# ═══════════════════════════════════════════════════════════
-  deploy:
-    name: Terraform Deploy
-    runs-on: ubuntu-latest
-    needs: upload_to_s3
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region:            ${{ secrets.AWS_REGION }}
-
-      - uses: hashicorp/setup-terraform@v3
-        with: { terraform_version: "~1.8" }
-
-      - uses: actions/download-artifact@v4
-        with: { name: image-tag, path: /tmp }
-
-      - name: Terraform Init
-        working-directory: terraform
-        run: |
-          terraform init \
-            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
-            -backend-config="key=prod/terraform.tfstate" \
-            -backend-config="region=${{ secrets.AWS_REGION }}"
-
-      - name: Terraform Validate
-        working-directory: terraform
-        run: terraform validate
-
-      - name: Terraform Plan
-        working-directory: terraform
-        run: |
-          terraform plan \
-            -var="aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}" \
-            -var="student_name=${{ secrets.STUDENT_NAME }}" \
-            -var="image_tag=$(cat /tmp/image-tag.txt)" \
-            -out=tfplan
-
-      - name: Terraform Apply
-        working-directory: terraform
-        run: terraform apply -auto-approve tfplan
-
-      - name: Show outputs
-        working-directory: terraform
-        run: |
-          terraform output -json \
-            | jq -r 'to_entries[] | "\(.key):\n  \(.value.value // "(sensitive)")\n"' \
-            || true

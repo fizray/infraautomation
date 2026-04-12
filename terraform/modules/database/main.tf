@@ -114,25 +114,6 @@ resource "aws_sqs_queue" "this" {
   }
 }
 
-data "aws_s3_bucket" "tfstate" {
-  bucket = var.tfstate_bucket_name
-}
-
-resource "aws_s3_bucket" "assets" {
-  bucket        = var.assets_bucket_name
-  force_destroy = true
-  tags          = { Name = var.assets_bucket_name }
-
-  lifecycle {
-    ignore_changes = all
-  }
-}
-
-resource "aws_s3_bucket_versioning" "assets" {
-  bucket = aws_s3_bucket.assets.id
-  versioning_configuration { status = "Enabled" }
-}
-
 resource "aws_ssm_parameter" "db_host" {
   name      = "/lks/app/db_host"
   type      = "String"

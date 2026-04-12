@@ -1,4 +1,4 @@
-# ── Terraform settings & remote state ──────────────────────
+# ── Terraform settings ─────────────────────────────────────
 # Do NOT add provider blocks here.
 # All providers are configured in main.tf
 terraform {
@@ -9,13 +9,5 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-  }
-
-  backend "s3" {
-    # Supplied at terraform init:
-    #   terraform init \
-    #     -backend-config="bucket=lks-tfstate-yourname-2026" \
-    #     -backend-config="key=prod/terraform.tfstate" \
-    #     -backend-config="region=us-east-1"
   }
 }

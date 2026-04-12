@@ -12,8 +12,6 @@ variable "db_instance_class" {
   type    = string
   default = "db.t3.micro"
 }
-variable "sqs_queue_name"      { type = string }
-variable "dlq_name"            { type = string }
-variable "dynamo_table"        { type = string }
-variable "tfstate_bucket_name" { type = string }
-variable "assets_bucket_name"  { type = string }
+variable "sqs_queue_name" { type = string }
+variable "dlq_name"       { type = string }
+variable "dynamo_table"   { type = string }
