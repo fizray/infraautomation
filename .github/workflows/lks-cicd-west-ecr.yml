@@ -1,4 +1,4 @@
-name: LKS 2026 — CI/CD Pipeline (Python + Flask)
+name: LKS 2026 — Monitoring CI/CD Pipeline
 
 on:
   push:
